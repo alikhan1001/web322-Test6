@@ -1,0 +1,76 @@
+
+<div id="errors"> 
+<!--div block to hold errors list--> 
+</div>
+
+<!--html form--> 
+
+<!--return false will prevent refresh the oage when submit the form--> 
+<form onsubmit="submitForm(); return false;">
+  <!--name input--> 
+  <input type="text" id="name" name="name" placeholder="Your Name...">
+  <br>
+  <!--email input--> 
+  <input type="text" id="email" name="email" placeholder="Your Email...">
+  <br>
+  <label>
+    <!--copy input checkbox--> 
+    <input type="checkbox"" id="copy" name="copy">
+    Send copy to your email
+  </label>
+  <br>
+    <!--message text area--> 
+  <textarea name="message" id="message" rows="5" cols="10"></textarea>
+  <br>
+    <!--submit button--> 
+  <button type="submit">Submit</button>
+</form> 
+
+<div id="success">
+<!--html block to hold succes message , when validation pass with no error--> 
+</div>
+
+<script>
+
+//function to be called when the submit button clicked
+function submitForm(){
+
+  //clear errors and success blocks
+  $("#errors").html("");
+  $("#success").html("");
+
+ // send data to the server side as a json object
+  $.post("/validate-form",
+  {
+    name: $("#name").val(),
+    email: $("#email").val(),
+    copy: $("#copy").prop('checked'),
+    message: $("#message").val()
+  },
+  function(result,status){
+    // integer to count number of errors  
+    var count = 0;
+    
+    // this variable will hold errors list
+    var data="<ul>";
+    $.each(result, function(i, field){
+      // if there is an error we increment count
+      count++;
+      data+="<li>"+field.error+"</li>";
+    });
+    data+="</ul>";
+
+ 	// if there is some errors we display them inside errors html block
+    if(count>0){
+    // append errors to #errors block
+      $("#errors").append(data);
+    }
+    else{
+    // if there is no errors we display success message
+      $("#success").append("<h4>the form data pass the validation successfully</h4>");
+    }
+  });
+}
+</script>
+form.txt
+Displaying form.txt.

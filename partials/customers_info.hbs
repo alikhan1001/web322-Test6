@@ -1,0 +1,15 @@
+<h1>List of Customers</h1>
+
+{{#each this.customers ~}}
+  {{#if id}}
+  <ul>
+    <li> {{id}} </li>
+    <li> {{company}} </li>
+    <li> {{firstname}} </li>
+    <li> {{lastname}} </li>
+    <li> {{entered}} </li>
+  </ul>
+  {{^}}
+      no information available.
+  {{/if}}
+{{~/each}} 
