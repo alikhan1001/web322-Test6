@@ -1,56 +1,77 @@
+// setup server
 const express = require('express');
 const handlebars = require('express-handlebars');
 
 const app = express();
-
 app.use(
   express.urlencoded({
     extended: true
   })
 )
-
+app.use(express.json());
 
 // setup handlebars
 app.set('view engine', 'hbs');
-
-
-// using main.hbs as a default layout
+// main.hbs is the default layout
 app.engine('hbs', handlebars({
-    layoutsDir: __dirname + '/views/layouts',
+    layoutsDir: __dirname + '/views/',
     extname: 'hbs',
     defaultLayout: 'main'
 }));
-
-
 app.use(express.static('public'));
 
-
-
-// customers data | if you didn't add "customers" to the begin of json , you will not able to chandle it in views
-
-// as mentioned in exercise : "customers" object , and that what i did
-let jsonData={"customers":[
-
-{ "id": "_4FG12Y7U6", "company": "Avionics Inc.", "firstname": "John", "lastname": "Doe", "entered": "2013-06-12T10:00:00Z" },
-
-{ "id": "_4FG12Y7TX", "company": "Avis World Headquarters", "firstname": "Steve", "lastname": "Herbin", "entered": "2013-09-10T10:00:00Z" },
-
-{ "id": "_4FG12Y7TV", "company": "BGP Productions", "firstname": "German", "lastname": "Vicencio", "entered": "2013-09-30T12:46:40Z" }
-
-]};
-
-
-// setup a route for home.hbs template view
+// serve the form page
 app.get('/', (req, res) => {
-    // Integrates the body of "home.hbs" inside the defaultLayout "main.hbs"
-    res.render('home',jsonData);
+    res.render('form');
 });
 
-// server listen port
-const port = 3000;
+// validition when post to /validate-form
+app.post('/validate-form', (req, res) => {
+    // errors array will contains all errors
+    let errors=[];
+
+  	// get name value
+    let name= req.body["name"];
+    
+    // get email value
+    let email= req.body["email"];
+    
+    // get copy value | we won't need it in this exercise
+    let copy= req.body["copy"];
+    
+    // get messagevalue
+    let message= req.body["message"];
 
 
-// run server
-app.listen(port, () => console.log(`App listening to port ${port}`));
+    // regular expression for email validation 
+    var emailExp=/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
 
+	// check if null or empty ,error if not met the creteria
+    if(name==null || name=="") {
+    //push error message to array
+      errors.push({"error":"name is not valid"});
+    }
+    
+    // check if null or empty and verify email if match with regular expression, error if not met the creteria
+    if(email==null || email=="" || !(email.match(emailExp))) {
+    // //push error message to array
+      errors.push({"error":"email is not valid"});
+    }
+    
+    
+// check if null or empty and check if length if message length is at least 10 , error if not met the creteria
+    if(message==null || message=="" || message.length<10) {
+    ////push error message to array
+      errors.push({"error":"message is not valid"});
+    }
+    
+    // return response with errors array
+    res.json(errors);
+
+});
+
+// run the server to listen to port 3000
+app.listen(3000, () => {
+  console.log('server started');
+});
